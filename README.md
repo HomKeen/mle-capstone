@@ -1,5 +1,9 @@
 # RSNA Intracranial Hemorrhage (ICH) Prediction Model
-Production repository for my UCSD Extension MLE course capstone project.
+Production repository for my UCSD Extension MLE course capstone project. Access the API here: 
+
+<http://65.49.54.233>
+
+For instructions on usage, see below.
 
 ## Overview
 
