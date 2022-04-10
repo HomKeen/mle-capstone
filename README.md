@@ -13,7 +13,7 @@ My project used a GPU to train TensorFlow models, then saved these models in Ten
 
 ### From my pretrained models
 
-All of the files necessary for running my Docker container is in the "app" folder. The folder contains the Dockerfile, requirements.txt, the folders containing the necessary trained models in TensorFlow format, as well as some convenience shell scripts. Simply download the app folder and move it to wherever you want; I recommend a VM running on a cloud platform for easy access over the internet. First, you will need the appropriate TensorFlow docker image. From the terminal, run:
+All of the files necessary for running my Docker container is in the "app" folder. The folder contains the Dockerfile, requirements.txt, the folders containing the necessary trained models in TensorFlow format, as well as some convenience shell scripts. Simply download the app folder and move it to wherever you want; I recommend a VM running on a cloud platform for easy access over the internet- but make sure that your VM allows HTTP and HTTPS traffic, otherwise this won't work. First, you will need the appropriate TensorFlow docker image. From the terminal, run:
 `docker pull tensorflow/tensorflow:latest-gpu-jupyter`. Then, in the "app" folder call `./build_and_run.sh` from the terminal and the application will be spun up. If you want to stop the Docker container and remove its image, run `./remove_docker.sh` from the terminal.
 
 ### From scratch
