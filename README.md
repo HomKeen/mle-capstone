@@ -7,6 +7,19 @@ This repository hosts the scripts that I used to retrieve, clean, and process th
 
 My RSNA model classifies into six classes, and a data matrix may be a member of multiple classes. There are five classes representing five subtypes of ICH: epidural, intraparenchymal, intraventricular, subarachnoid, and subdural; a sixth class called "Any" represents the presence of any type of ICH. The model returns a vector of length 6 with values between 0 and 1 representing probabilities; a probability value of >0.5 is interpreted as TRUE, i.e. the corresponding type of ICH is predicted to be present.
 
+## Recreating my project
+
+My project used a GPU to train TensorFlow models, then saved these models in TensorFlow SavedModel format. Using Starlette (a lightweight ASGI framework, and alternative to Flask), a Python script runs inside the Docker container and provides the necessary API call actions.
+
+### From my pretrained models
+
+All of the files necessary for running my Docker container is in the "app" folder. The folder contains the Dockerfile, requirements.txt, the folders containing the necessary trained models in TensorFlow format, as well as some convenience shell scripts. Simply download the app folder and move it to wherever you want; I recommend a VM running on a cloud platform for easy access over the internet. First, you will need the appropriate TensorFlow docker image. From the terminal, run:
+`docker pull tensorflow/tensorflow:latest-gpu-jupyter`. Then, in the "app" folder call `./build_and_run.sh` from the terminal and the application will be spun up. If you want to stop the Docker container and remove its image, run `./remove_docker.sh` from the terminal.
+
+### From scratch
+
+
+
 ## Using the API
 
 Using a browser, navigate to my VM's external IP:
@@ -17,12 +30,12 @@ Then, you should see the following simple GUI:
 
 The API accepts only 2 types of files, in specific format:
 1. A DICOM file (.dcm) 
-2. A PNG file (.png) in a 512x512 RGB image, where the 3 color channels represent the bone, subdural, and soft tissue windows assembled into one image (learn more about windowing in radiology [here](https://radiopaedia.org/articles/windowing-ct?lang=us)).
+2. A PNG file (.png) in a 512x512 RGB image, where the 3 color channels represent the bone, subdural, and soft tissue windows assembled into one image (learn more about windowing in radiology [here](https://radiopaedia.org/articles/windowing-ct?lang=us)). 
+
+If the user provides an invalid file type or a file with invalid contents, the API will return an error message prompting them to try again.
 
 Simply click the "Choose File" button, upload the appropriate DICOM or PNG file from your local system, and then click the "Predict". The webpage should change and return your predictions, for example:
 
 ![alt text](https://github.com/HomKeen/mle-capstone/blob/main/prediction-results.png)
 
 The API will return the raw probabilities returned by the model, the list of ICH predictions as booleans, the interpreted results, and the image you uploaded for reference. For example, the above CT slice was predicted to have a 0.7173 probability of having intraparenchymal ICH, interpreted as TRUE.
-
-## 
