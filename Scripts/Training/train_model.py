@@ -32,9 +32,9 @@ All these implementation decisions contribute to a scalable model. I had to make
 import pydicom as dcm
 import numpy as np
 import pandas as pd
+import tensorflow as tf
 import os
 import sys
-import tensorflow as tf
 import math
 import csv
 import time
@@ -49,7 +49,8 @@ from joblib import Parallel, delayed
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 keras.mixed_precision.set_global_policy('mixed_float16')
 physical_devices = tf.config.list_physical_devices('GPU')
-tf.config.experimental.set_memory_growth(physical_devices[0], True)
+if physical_devices:
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 train_img_dir = '~/rsna-intracranial-hemorrhage-detection/stage_2_train_imgs/'
 train_label_path = '~/rsna-intracranial-hemorrhage-detection/train_labels.csv'
@@ -73,7 +74,7 @@ class RSNASequence(keras.utils.Sequence):
     """
     A keras Sequence which provides training data to the model
     """
-    def __init__(self, labels, train_cutoff, batch_size, extractor, img_dir, n_slices,                 train_img_ct, train_img_ct_ind, feature_dir='~/extracted-features/', ):
+    def __init__(self, labels, train_cutoff, batch_size, extractor, img_dir, n_slices, train_img_ct, train_img_ct_ind, feature_dir='~/extracted-features/'):
         self.x = None
         self.y = labels #DataFrame of all labels for the whole training set
         self.train_cutoff = train_cutoff #number of images to predict for in one epoch
@@ -162,10 +163,11 @@ class RSNASequence(keras.utils.Sequence):
         
     def precompute_features(self):
         """
+        [DEPRECATED]
         Passes all the images through the extractor model first before training and save them in self.feature_dir as 
         feature vectors.
         """
-        return
+        
         to_compute = set()
         present = set(x.split('.')[0] for x in os.listdir(self.feature_dir))
         print('Collecting necessary slices...')
