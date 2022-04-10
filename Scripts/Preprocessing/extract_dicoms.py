@@ -14,10 +14,10 @@ from PIL import Image
 from joblib import Parallel, delayed
 
 
-img_dir_train = '/home/jupyter/rsna-intracranial-hemorrhage-detection/stage_2_train/'
-png_dir_train = '/home/jupyter/rsna-intracranial-hemorrhage-detection/stage_2_train_imgs/'
-img_dir_test = '/home/jupyter/rsna-intracranial-hemorrhage-detection/stage_2_test/'
-png_dir_test = '/home/jupyter/rsna-intracranial-hemorrhage-detection/stage_2_test_imgs'
+img_dir_train = '../../rsna-intracranial-hemorrhage-detection/stage_2_train/'
+png_dir_train = '../../rsna-intracranial-hemorrhage-detection/stage_2_train_imgs/'
+img_dir_test = '../../rsna-intracranial-hemorrhage-detection/stage_2_test/'
+png_dir_test = '../../rsna-intracranial-hemorrhage-detection/stage_2_test_imgs'
 warnings.filterwarnings('ignore')
 
 def is_invalid(img_path):
@@ -100,10 +100,10 @@ and save this metadata into another csv file
 """
 
 
-out_file_train_scans = '/home/jupyter/rsna-intracranial-hemorrhage-detection/train_ct_scans.csv'
-out_file_test_scans = '/home/jupyter/rsna-intracranial-hemorrhage-detection/test_ct_scans.csv'
-out_file_train_coords = '/home/jupyter/rsna-intracranial-hemorrhage-detection/train_ct_coords.csv'
-out_file_test_coords = '/home/jupyter/rsna-intracranial-hemorrhage-detection/test_ct_coords.csv'
+out_file_train_scans = '../../rsna-intracranial-hemorrhage-detection/train_ct_scans.csv'
+out_file_test_scans = '../../rsna-intracranial-hemorrhage-detection/test_ct_scans.csv'
+out_file_train_coords = '../../rsna-intracranial-hemorrhage-detection/train_ct_coords.csv'
+out_file_test_coords = '../../rsna-intracranial-hemorrhage-detection/test_ct_coords.csv'
 
 scans = {}
 img_coords = []

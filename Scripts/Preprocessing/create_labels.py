@@ -5,8 +5,8 @@ given RSNA label file (which is badly formatted).
 
 import pandas as pd
 
-in_file_path = '~/rsna-intracranial-hemorrhage-detection/stage_2_train.csv'
-out_file_path = '~/rsna-intracranial-hemorrhage-detection/train_labels.csv'
+in_file_path = '../../rsna-intracranial-hemorrhage-detection/stage_2_train.csv'
+out_file_path = '../../rsna-intracranial-hemorrhage-detection/train_labels.csv'
 df = pd.read_csv(in_file_path)
 
 # Extract the type of hemorrhage from the ID column

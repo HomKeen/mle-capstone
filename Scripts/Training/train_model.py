@@ -52,15 +52,15 @@ physical_devices = tf.config.list_physical_devices('GPU')
 if physical_devices:
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
-train_img_dir = '~/rsna-intracranial-hemorrhage-detection/stage_2_train_imgs/'
-train_label_path = '~/rsna-intracranial-hemorrhage-detection/train_labels.csv'
-train_ct_path = '~/rsna-intracranial-hemorrhage-detection/train_ct_scans.csv'
-train_coord_path = '~/rsna-intracranial-hemorrhage-detection/train_ct_coords.csv'
-base_model_path = '~/base-cnn-model/checkpoint.ckpt'
+train_img_dir = '../../rsna-intracranial-hemorrhage-detection/stage_2_train_imgs/'
+train_label_path = '../../rsna-intracranial-hemorrhage-detection/train_labels.csv'
+train_ct_path = '../../rsna-intracranial-hemorrhage-detection/train_ct_scans.csv'
+train_coord_path = '../../rsna-intracranial-hemorrhage-detection/train_ct_coords.csv'
+base_model_path = '../../base-cnn-model'
 
-saved_model_path = '~/Notebooks/Training/rnn-model-checkpoints/checkpoint.ckpt' 
+saved_model_path = '../../rsna-rnn-model/' 
 
-test_img_dir = '~/rsna-intracranial-hemorrhage-detection/stage_2_test_imgs/'
+test_img_dir = '../../rsna-intracranial-hemorrhage-detection/stage_2_test_imgs/'
 
 n_epochs = 6
 
@@ -74,7 +74,7 @@ class RSNASequence(keras.utils.Sequence):
     """
     A keras Sequence which provides training data to the model
     """
-    def __init__(self, labels, train_cutoff, batch_size, extractor, img_dir, n_slices, train_img_ct, train_img_ct_ind, feature_dir='~/extracted-features/'):
+    def __init__(self, labels, train_cutoff, batch_size, extractor, img_dir, n_slices, train_img_ct, train_img_ct_ind, feature_dir='../../extracted-features/'):
         self.x = None
         self.y = labels #DataFrame of all labels for the whole training set
         self.train_cutoff = train_cutoff #number of images to predict for in one epoch
@@ -316,7 +316,7 @@ class RSNAModel:
         
 
 
-model = RSNAModel(train_img_dir, train_label_path, train_ct_path, train_coord_path, base_model_path, feature_dir='~/extracted-features/')
+model = RSNAModel(train_img_dir, train_label_path, train_ct_path, train_coord_path, base_model_path, feature_dir='../../extracted-features/')
 #set to None in order to train a new model from scratch, or set to the saved_model_path to retrieve a previous model.
 # model.initialize_model(None)
 model.initialize_model(saved_model_path)

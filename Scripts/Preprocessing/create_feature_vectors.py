@@ -16,9 +16,13 @@ from joblib import Parallel, delayed
 from tensorflow import keras
 
 
-feature_dir = '/home/jupyter/extracted-features/' #directory to store all NPY files containing extracted features
-train_img_dir = '/home/jupyter/rsna-intracranial-hemorrhage-detection/stage_2_train_imgs/' #directory containing all DICOM training images as PNGs
-extractor_path = '/home/jupyter/base-cnn-model/checkpoint.ckpt/' #directory containing the model of the base CNN feature extractor
+feature_dir = '../../extracted-features/' #directory to store all NPY files containing extracted features
+#create the feature directory if it doesn't exist yet
+if not os.path.exists(feature_dir):
+    os.makedirs(feature_dir)
+
+train_img_dir = '../../rsna-intracranial-hemorrhage-detection/stage_2_train_imgs/' #directory containing all DICOM training images as PNGs
+extractor_path = '../../base-cnn-model/' #directory containing the model of the base CNN feature extractor
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 keras.mixed_precision.set_global_policy('mixed_float16')

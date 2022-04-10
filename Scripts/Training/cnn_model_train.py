@@ -21,9 +21,10 @@ keras.mixed_precision.set_global_policy('mixed_float16')
 
 
 
-png_path = '~/rsna-intracranial-hemorrhage-detection/stage_2_train_imgs/'
-label_path = '~/rsna-intracranial-hemorrhage-detection/train_labels.csv'
-model_save_path = '~/base-cnn-model/'
+png_path = '../../rsna-intracranial-hemorrhage-detection/stage_2_train_imgs/'
+label_path = '../../rsna-intracranial-hemorrhage-detection/train_labels.csv'
+model_save_path = '../../base-cnn-model'
+
 
 batch_size = 32 
 #Training the whole dataset takes ~9 hours, so we cut it short. Set this to -1 to train on the whole dataset
@@ -74,8 +75,8 @@ model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=False),
                        keras.metrics.Precision(), keras.metrics.Recall()],
              optimizer=keras.optimizers.Adam(learning_rate=1e-4))
 
-cp_callback = keras.callbacks.ModelCheckpoint(filepath='reproduce_training_2/checkpoint.ckpt',
-                                                 save_weights_only=True,
+cp_callback = keras.callbacks.ModelCheckpoint(filepath=model_save_path,
+                                                 save_weights_only=False,
                                                  verbose=1)
 
 
