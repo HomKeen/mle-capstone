@@ -18,7 +18,22 @@ All of the files necessary for running my Docker container is in the "app" folde
 
 ### From scratch
 
+If you wish to train from scratch, you can look in the "Scripts" folder. There are several requirements for training, as the dataset is vast and complex:
+1. A CUDA-enabled GPU (the faster, the better)
+2. TensorFlow 2 and the appropriate version of CUDA installed (depends on your GPU)
+3. Python 3; latest versions of pip, numpy, pandas, Pydicom, pillow, tqdm, and joblib installed
+4. At least 700GB of free disk space
+5. At least 16GB of memory 
 
+Your machine In a terminal on the machine you wish to train on, do the following tasks:
+1. Run `kaggle competitions download -c rsna-intracranial-hemorrhage-detection` to download the zipped. IMPORTANT: if you don't yet have a Kaggle API token set up on your machine, refer to [the Kaggle docs](https://www.kaggle.com/docs/api) for more information.
+2. Run `pip install unzip` and then `unzip rsna-intracranial-hemorrhage-detection.zip` to unzip the files into "rsna-intracranial-hemorrhage-detection"
+3. Copy the "Scripts" folder onto your machine, in the same directory as "rsna-intracranial-hemorrhage-detection"
+4. From the terminal, in the "Scripts/Preprocessing" folder, run `python extract_dicoms.py`, then `python create_labels.py`. This will extract the labels and necessary metadata, as well as process the data into PNG files. 
+5. In the same directory, run `python cnn_model_train.py`. This will fine tune a ResNet-101 model and will serve as the feature extractor. Next, run `python create_feature_vectors.py` to use the tuned CNN model to save the extracted features of each data file into an NPY file. This will reduce the computational burden on the RNN model.
+6. Finally, in the same directory, run `python train_model.py` to train the RNN model using the extracted features from the CNN model.
+7. You will end up with the folders "base-cnn-model" and "rsna-rnn-model" which contain the CNN and RNN models, respectively, in TensorFlow SavedModel format. These folders are identical in function to the folders in the "app" folder with the same name in this repository.
+8. Follow directions from the above section ("From my pretrained models") to deploy the model into a Docker container.
 
 ## Using the API
 
