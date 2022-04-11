@@ -11,4 +11,4 @@ RUN pip install -r requirements.txt
 EXPOSE 8008
 
 # Start the server
-CMD ["python", "app.py", "serve"]
+CMD ["python", "app.py"]

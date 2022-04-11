@@ -1,9 +1,3 @@
-import tensorflow as tf
-from tensorflow import keras
-import pydicom as dcm
-import numpy as np
-import io
-
 #web frameworks
 from starlette.applications import Starlette
 from starlette.responses import JSONResponse, HTMLResponse, RedirectResponse
@@ -11,13 +5,20 @@ import uvicorn
 import aiohttp
 import asyncio
 
+from PIL import Image
+from tensorflow import keras
+import tensorflow as tf
+import pydicom as dcm
+import numpy as np
+import io
 import os
 import sys
 import base64 
-from PIL import Image
 
+
+#set up GPU
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-keras.mixed_precision.set_global_policy('mixed_float16')
+keras.mixed_precision.set_global_policy('mixed_float16') #for extra speed, if applicable
 physical_devices = tf.config.list_physical_devices('GPU')
 if physical_devices:
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
@@ -29,20 +30,22 @@ rnn_model = keras.models.load_model(saved_model_path)
 cnn_model = keras.models.load_model(base_model_path)
 extractor = keras.models.Sequential(cnn_model.layers[:-1])
 
-async def get_bytes(url):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            return await response.read()
 
+"""
+The next 3 functions are for processing DICOM files. They combine to filter the raw pixel values into 3
+windows, which are then assembled as a 3 channel image and saved as RGB.
+"""
 def get_center_and_width(dicom):
     return tuple([int(x[0]) if type(x) == dcm.multival.MultiValue else int(x) for x in [dicom.WindowCenter, dicom.WindowWidth]])
 
+#normalize an image to be in the range [0,1]
 def normalize_minmax(img):
     mi, ma = img.min(), img.max()
     if mi == ma:
         return img-mi
     return (img - mi) / (ma - mi)
 
+#apply a window filter to an image
 def window_filter(img, center, width, slope, intercept):
     out = np.copy(img)
     out = out*slope + intercept
@@ -53,6 +56,7 @@ def window_filter(img, center, width, slope, intercept):
     out[out > highest_visible] = highest_visible
     return normalize_minmax(out) * 255
 
+#assembles the filtered image and returns it as a tensor, given the path to a DICOM file
 def get_img_tensor(img_path):
     dicom = dcm.dcmread(img_path, force=True)
     
@@ -65,23 +69,35 @@ def get_img_tensor(img_path):
     
     return np.stack([brain, subdural, tissue], axis=2).astype(np.float32) / 255.
 
-    
 
+async def get_bytes(url):
+    """
+    Retrieves the raw bytes from an upload call
+    """
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            return await response.read()
+    
 @app.route("/upload", methods = ["POST"])
 async def upload(request):
+    """
+    Retrieves data from a user upload and applies the model prediction to it.
+    """
     data = await request.form()
     bytes = await (data["file"].read())
     return predict_image_from_bytes(bytes)
 
-@app.route("/classify-url", methods = ["GET"])
-async def classify_url(request):
-    bytes = await get_bytes(request.query_params["url"])
-    return predict_image_from_bytes(bytes)
+
 
 def predict_image_from_bytes(bytes):
+    """
+    Given a stream of raw byte data representing a user's uploaded file, validate the file's type
+    and then predict the presence of ICH.
+    """
     #load byte data into a stream
     img_file = io.BytesIO(bytes)
     try:
+        #try to first load as a DICOM file
         img_data = get_img_tensor(img_file)
         img_file = Image.fromarray((img_data*255).astype(np.uint8))
         img_file.save("img.png")
@@ -95,6 +111,7 @@ def predict_image_from_bytes(bytes):
         
     except:
         try:
+            #if not a DICOM file, try to laod as a PNG
             img_file = Image.open(img_file)
             img_file.save("img.png")
             img_uri = base64.b64encode(open("img.png", 'rb').read()).decode('utf-8')
@@ -104,6 +121,7 @@ def predict_image_from_bytes(bytes):
             pred = rnn_model.predict(tf.expand_dims(feat, axis=0)).flatten()
             pred_array = np.array(pred >= 0.5, dtype=np.bool)
         except:
+            #if the PNG is invalid or the file is of some other type, return an error message.
             return HTMLResponse(
             """
             <html>
@@ -114,7 +132,7 @@ def predict_image_from_bytes(bytes):
             """
             )
 
-    
+    #upon successful prediction, return some basic HTML containing the prediction results.
     return HTMLResponse(
         f"""
         <html>
@@ -142,7 +160,11 @@ def predict_image_from_bytes(bytes):
         
 @app.route("/")
 def form(request):
-        return HTMLResponse(
+    """
+    Basic HTML homepage for the UI
+    """
+    
+    return HTMLResponse(
             """
             <h1> RSNA Intracranial Hemorrhage Detection ML Service</h1>
             <h3> By Keenan Hom </h3>
@@ -160,6 +182,6 @@ def redirect_to_homepage(request):
         return RedirectResponse("/")
         
 if __name__ == "__main__":
-    if "serve" in sys.argv:
-        port = int(os.environ.get("PORT", 8008)) 
-        uvicorn.run(app, host = "0.0.0.0", port = port)
+    #run the app through container port 8008, which has been exposed by the Dockerfile.
+    port = int(os.environ.get("PORT", 8008)) 
+    uvicorn.run(app, host = "0.0.0.0", port = port)
