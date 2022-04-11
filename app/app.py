@@ -21,6 +21,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 keras.mixed_precision.set_global_policy('mixed_float16') #for extra speed, if applicable
 physical_devices = tf.config.list_physical_devices('GPU')
 if physical_devices:
+    #if a GPU is available, then allow full access to its memory
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 app = Starlette()
@@ -45,7 +46,7 @@ def normalize_minmax(img):
         return img-mi
     return (img - mi) / (ma - mi)
 
-#apply a window filter to an image
+#apply a window filter to an image, based on some parameters contained in the DICOM file
 def window_filter(img, center, width, slope, intercept):
     out = np.copy(img)
     out = out*slope + intercept
@@ -56,7 +57,7 @@ def window_filter(img, center, width, slope, intercept):
     out[out > highest_visible] = highest_visible
     return normalize_minmax(out) * 255
 
-#assembles the filtered image and returns it as a tensor, given the path to a DICOM file
+#assembles the filtered image and returns it as a np.ndarray, given the path to a DICOM file
 def get_img_tensor(img_path):
     dicom = dcm.dcmread(img_path, force=True)
     
@@ -98,27 +99,33 @@ def predict_image_from_bytes(bytes):
     img_file = io.BytesIO(bytes)
     try:
         #try to first load as a DICOM file
+        #save the DICOM file locally in order to display it on the results page
         img_data = get_img_tensor(img_file)
         img_file = Image.fromarray((img_data*255).astype(np.uint8))
         img_file.save("img.png")
         img_uri = base64.b64encode(open("img.png", 'rb').read()).decode('utf-8')
         
+        #compute the prediction
         data = tf.expand_dims(tf.cast(img_data, tf.float32), axis=0)
         feat = extractor.predict(data)
         pred = rnn_model.predict(tf.expand_dims(feat, axis=0)).flatten()
+        #get the binary predictions
         pred_array = np.array(pred >= 0.5, dtype=np.bool)
         
         
     except:
         try:
             #if not a DICOM file, try to laod as a PNG
+            #save the PNG file locally in order to display it on the results page
             img_file = Image.open(img_file)
             img_file.save("img.png")
             img_uri = base64.b64encode(open("img.png", 'rb').read()).decode('utf-8')
-
+            
+            #compute the prediction
             data = tf.expand_dims(tf.convert_to_tensor(np.array(img_file), dtype=tf.float32) / 255., axis=0)
             feat = extractor.predict(data)
             pred = rnn_model.predict(tf.expand_dims(feat, axis=0)).flatten()
+            #get the binary predictions
             pred_array = np.array(pred >= 0.5, dtype=np.bool)
         except:
             #if the PNG is invalid or the file is of some other type, return an error message.
