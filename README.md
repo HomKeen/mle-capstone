@@ -11,6 +11,8 @@ This repository hosts the scripts that I used to retrieve, clean, and process th
 
 My RSNA model classifies into six classes, and a data matrix may be a member of multiple classes. There are five classes representing five subtypes of ICH: epidural, intraparenchymal, intraventricular, subarachnoid, and subdural; a sixth class called "Any" represents the presence of any type of ICH. The model returns a vector of length 6 with values between 0 and 1 representing probabilities; a probability value of >0.5 is interpreted as TRUE, i.e. the corresponding type of ICH is predicted to be present.
 
+Note: The RSNA dataset contains around 750k training images and 122k testing, amounting to about 453GB of data. This is absolutely not going to fit on GitHub, so I provide instructions on how to download the data for yourself if desired.
+
 ## Recreating my project
 
 My project used a GPU to train TensorFlow models, then saved these models in TensorFlow SavedModel format. Using Starlette (a lightweight ASGI framework, and alternative to Flask), a Python script runs inside the Docker container and provides the necessary API call actions.
