@@ -32,7 +32,7 @@ If you wish to train from scratch, you can look in the "Scripts" folder. There a
 5. At least 16GB of memory 
 
 Your machine In a terminal on the machine you wish to train on, do the following tasks:
-1. Run `kaggle competitions download -c rsna-intracranial-hemorrhage-detection` to download the zipped. IMPORTANT: if you don't yet have a Kaggle API token set up on your machine, refer to [the Kaggle docs](https://www.kaggle.com/docs/api) for more information.
+1. Run `kaggle competitions download -c rsna-intracranial-hemorrhage-detection` to download the zipped dataset. IMPORTANT: if you don't yet have a Kaggle API token set up on your machine, refer to [the Kaggle docs](https://www.kaggle.com/docs/api) for more information, as you will need a Kaggle account as well as the token to download the dataset.
 2. Run `pip install unzip` and then `unzip rsna-intracranial-hemorrhage-detection.zip` to unzip the files into "rsna-intracranial-hemorrhage-detection"
 3. Copy the "Scripts" folder onto your machine, in the same directory as "rsna-intracranial-hemorrhage-detection"
 4. From the terminal, in the "Scripts/Preprocessing" folder, run `python extract_dicoms.py`, then `python create_labels.py`. This will extract the labels and necessary metadata, as well as process the data into PNG files. 
