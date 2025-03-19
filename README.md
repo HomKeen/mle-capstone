@@ -1,13 +1,9 @@
 # RSNA Intracranial Hemorrhage (ICH) Prediction Model
-Production repository for my UCSD Extension MLE course capstone project. Access the API here: 
-
-<http://65.49.54.233>
-
-For instructions on usage, see below.
+Production repository for my UCSD Extension MLE course capstone project. For instructions on usage, see below.
 
 ## Overview
 
-This repository hosts the scripts that I used to retrieve, clean, and process the data (courtesy of the [RSNA Intracranial Hemorrhage Detection Kaggle Dataset](https://www.kaggle.com/c/rsna-intracranial-hemorrhage-detection/data), as well as train the model (in the "Scripts" folder). It also contains the Dockerfile and other necessary files for running my model with an API in a Docker container for getting predictions (in the "app" folder). Currently, my Docker container is hosted on a [Paperspace](https://www.paperspace.com/) CORE Virtual Machine, and is accessible to anyone on the internet. Additionally, you can use this repository to replicate my work with your own Docker container.
+This repository hosts the scripts that I used to retrieve, clean, and process the data (courtesy of the [RSNA Intracranial Hemorrhage Detection Kaggle Dataset](https://www.kaggle.com/c/rsna-intracranial-hemorrhage-detection/data), as well as train the model (in the "Scripts" folder). It also contains the Dockerfile and other necessary files for running my model with an API in a Docker container for getting predictions (in the "app" folder). You can use this repository to replicate my work with your own Docker container.
 
 My RSNA model classifies into six classes, and a data matrix may be a member of multiple classes. There are five classes representing five subtypes of ICH: epidural, intraparenchymal, intraventricular, subarachnoid, and subdural; a sixth class called "Any" represents the presence of any type of ICH. The model returns a vector of length 6 with values between 0 and 1 representing probabilities; a probability value of >0.5 is interpreted as TRUE, i.e. the corresponding type of ICH is predicted to be present.
 
@@ -43,9 +39,7 @@ In a terminal on the machine you wish to train on, do the following tasks:
 
 ## Using the API
 
-Using a browser, navigate to my VM's external IP:
-<http://65.49.54.233>
-Then, you should see the following simple GUI:
+You can then host on local or on a cloud server to test to API, as shown in the "app" folder.
 
 ![alt text](https://github.com/HomKeen/mle-capstone/blob/main/gui-view.png)
 
